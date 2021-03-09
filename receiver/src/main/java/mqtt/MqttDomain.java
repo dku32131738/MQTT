@@ -3,7 +3,10 @@ package mqtt;
 import java.util.StringTokenizer;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
 import http.SendHttp;
@@ -11,23 +14,26 @@ import http.SendHttp;
 public class MqttDomain {
 	
 	private String id;
-	private String gps;
+	private JsonArray gps;
 	private String time;
 	
 	//객체 생성
 	public MqttDomain (String message)
 	{
-		convertMessage(message);
+		JsonParser parser=new JsonParser();
+		JsonElement result=parser.parse(message);
+		convertMessage(result.getAsJsonObject());
 	}
 	
 	//message를 이용하여 id,gps,time 생성 (미완성)
-	public void convertMessage(String message) {
-		System.out.println(message);
-		Gson gson=new Gson();
-		Rider rider=gson.fromJson(message, Rider.class);
-		this.id=rider.getId();
-		this.gps=rider.getGps();
-		this.time=rider.getTime();
+	public void convertMessage(JsonObject message) {
+		String type=message.get("type").getAsString();
+		JsonObject properties=message.get("properties").getAsJsonObject();
+		JsonObject geometry=message.get("geometry").getAsJsonObject();
+		this.id=properties.get("id").getAsString();
+		this.time=properties.get("time").getAsString();
+		this.gps=geometry.get("coordinates").getAsJsonArray();
+		System.out.println("test : "+message);
 	}
 	
 	//SendHttp를 사용하여 데이터를 서버로 전송

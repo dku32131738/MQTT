@@ -4,12 +4,17 @@ import java.util.Date;
 
 import org.junit.After;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ictway.mqtt.domain.Rider;
 import com.ictway.mqtt.repository.MemoryRiderRepository;
+import com.ictway.mqtt.service.ReceiveHttpService;
 
 public class MemoryRiderRepositoryTest {
 
+	@Autowired
+	ReceiveHttpService receiveHttpService;
+	
 	MemoryRiderRepository repository=new MemoryRiderRepository();
 	
 	@After
@@ -28,20 +33,7 @@ public class MemoryRiderRepositoryTest {
 	}
 	
 	@Test
-	public void findById() {
-		Date time = new Date();
-		Rider rider1=new Rider();
-		rider1.setId("rider1");
-		rider1.setGps("127.0.01:136.06.3");
-		rider1.setTime(time);
-		repository.save(rider1);
-		
-		Rider rider2=new Rider();
-		rider2.setId("rider1");
-		rider2.setGps("127.0.01:136.06.3");
-		rider2.setTime(time);
-		repository.save(rider2);
-		
-		Rider result=repository.findById("rider1").get();
+	public void insertRider() {
+		receiveHttpService.insertRider("r02","[agagaagagaahaaha]" ,"2021-03-15 10:00:11" );
 	}
 }

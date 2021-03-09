@@ -1,5 +1,7 @@
 package http;
 
+import com.google.gson.JsonArray;
+
 //서버로 http를 전송
 public class SendHttp {
 
@@ -7,7 +9,7 @@ public class SendHttp {
 	private String url;
 	private String message;
 	
-	public SendHttp(String id,String gps,String time) {
+	public SendHttp(String id,JsonArray gps,String time) {
 		String parameter="id="+id+"&gps="+gps+"&time="+time;
 		this.url=this.server+parameter;
 		System.out.println(this.url);
