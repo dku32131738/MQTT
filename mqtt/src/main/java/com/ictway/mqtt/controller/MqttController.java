@@ -16,9 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
-import com.ictway.mqtt.dao.RiderDAOImp;
-import com.ictway.mqtt.dto.RiderDTO;
-import com.ictway.mqtt.service.ReceiveHttpService;
 import com.ictway.mqtt.service.SendMqttService;
 
 //mqtt에 관련된 요청을 처리하는 controller
@@ -30,10 +27,9 @@ public class MqttController {
 	//http로 receiver가 요청을 하였을때
 	@GetMapping("/mqtt")
 	@ResponseBody
-	public String receiveMessage(@RequestParam("id") String id,@RequestParam("gps") String gps,@RequestParam("time") String time) {
+	public MqttDomain receiveMessage(@RequestParam("id") String id,@RequestParam("gps") String gps,@RequestParam("time") String time) {
 		//id,gps,시간정보를 얻듬
 		logger.info("access mqtt");
-		
 		MqttDomain mqttDomain=new MqttDomain();
 		Gson gson=new Gson();
 		SendMqttService sendMqttService=new SendMqttService(id,gson.toJson(mqttDomain));
@@ -44,7 +40,7 @@ public class MqttController {
 			mqttDomain.setTime(new Date());
 		}else {
 		}
-		return "mqtt";
+		return mqttDomain;
 	}
 	
 	private class MqttDomain {

@@ -20,7 +20,7 @@ public class SendMqttService {
 	
 	//service 객체 생성 및 초기화
 	public SendMqttService(String topic,String content) {
-		this.broker="tcp://192.168.0.146:1883";;
+		this.broker="tcp://127.0.0.1:1883";;
 		this.clientID="system";
 		this.topic=topic;
 		this.content=content;
