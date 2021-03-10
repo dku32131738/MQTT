@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sql">
+<select id="selectAll" resultType="com.ictway.mqtt.domain.RiderDomain">     <!-- resultType 본인 환경에 맞게 수정 필요 -->
+	SELECT * FROM rider
+</select>
+<select id="selectId" resultType="com.ictway.mqtt.domain.RiderDomain">
+	SELECT * FROM rider
+	WHERE id LIKE #{id}
+</select>
+<insert id="insertRider" parameterType="com.ictway.mqtt.domain.RiderDomain">
+	INSERT INTO rider(id,latitude,longitude,time)
+	VALUES(#{id},#{latitude},#{longitude},#{time})
+</insert>
+<update id="updateRider">
+	UPDATE RIDER
+	SET time=#{time},latitude=#{latitude},longitude=#{longitude}
+	WHERE id LIKE #{id}
+</update>
+</mapper> 

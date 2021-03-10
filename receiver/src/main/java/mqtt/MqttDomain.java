@@ -14,10 +14,11 @@ import http.SendHttp;
 public class MqttDomain {
 	
 	private String id;
-	private JsonArray gps;
+	private float latitude;
+	private float longitude;
 	private String time;
 	
-	//객체 생성
+	//생성자 json 생성후 변환
 	public MqttDomain (String message)
 	{
 		JsonParser parser=new JsonParser();
@@ -25,20 +26,23 @@ public class MqttDomain {
 		convertMessage(result.getAsJsonObject());
 	}
 	
-	//message를 이용하여 id,gps,time 생성 (미완성)
+	//MQTT 메시지 변환
 	public void convertMessage(JsonObject message) {
 		String type=message.get("type").getAsString();
 		JsonObject properties=message.get("properties").getAsJsonObject();
 		JsonObject geometry=message.get("geometry").getAsJsonObject();
 		this.id=properties.get("id").getAsString();
 		this.time=properties.get("time").getAsString();
-		this.gps=geometry.get("coordinates").getAsJsonArray();
+		JsonArray gps=geometry.get("coordinates").getAsJsonArray();
+		this.latitude=gps.get(0).getAsFloat();
+		this.longitude=gps.get(1).getAsFloat();
+		
 		System.out.println("test : "+message);
 	}
 	
-	//SendHttp를 사용하여 데이터를 서버로 전송
+	//SendHttp瑜� �궗�슜�븯�뿬 �뜲�씠�꽣瑜� �꽌踰꾨줈 �쟾�넚
 	public void messageOfHttp() {
-		SendHttp sendHttp=new SendHttp(this.id,this.gps,this.time);
+		SendHttp sendHttp=new SendHttp(this.id,this.latitude,this.longitude,this.time);
 		System.out.println(sendHttp.getMessage());
 	}
 	

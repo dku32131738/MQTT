@@ -3,39 +3,39 @@ package mqtt;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
-//mqtt를 수신받는 클래스,설정 수행
+//mqtt瑜� �닔�떊諛쏅뒗 �겢�옒�뒪,�꽕�젙 �닔�뻾
 public class ReceiveMqtt{
 
 	private String broker= "tcp://192.168.0.146:1883";
 	private String clientId;
 	
-	//객체 생성 및 id 설정
+	//媛앹껜 �깮�꽦 諛� id �꽕�젙
 	public ReceiveMqtt(String clientId) {
 		this.clientId=clientId;
 	}
 	
-	//Client 객체를 이용하여 listen
+	//Client 媛앹껜瑜� �씠�슜�븯�뿬 listen
 	public String listen(int sec,String[] topics) {
-        final Consumer<HashMap<Object, Object>> pdk = (arg)->{  //메시지를 받는 콜백 행위
+        final Consumer<HashMap<Object, Object>> pdk = (arg)->{  //硫붿떆吏�瑜� 諛쏅뒗 肄쒕갚 �뻾�쐞
             arg.forEach((key, value)->{
             	if(key=="message") {
             		MqttDomain mqttDomain=new MqttDomain(value.toString());
             		mqttDomain.messageOfHttp();
             	}
-                System.out.println( String.format("메시지 도착 : 키 -> %s, 값 -> %s", key, value) );
+                System.out.println( String.format("messeage arrived : �key -> %s, value -> %s", key, value) );
             });            
         };
-        Client client = new Client(pdk);  //해당 함수를 생성자로 넣어준다.
+        Client client = new Client(pdk);  //�빐�떦 �븿�닔瑜� �깮�꽦�옄濡� �꽔�뼱以��떎.
         client.init(broker,clientId)
-              .subscribe(topics);  //subscribe 메소드는 구독할 대상
-        client.initConnectionLost( (arg)->{  //콜백행위1, 서버와의 연결이 끊기면 동작
+              .subscribe(topics);  //subscribe 硫붿냼�뱶�뒗 援щ룆�븷 ���긽
+        client.initConnectionLost( (arg)->{  //肄쒕갚�뻾�쐞1, �꽌踰꾩��쓽 �뿰寃곗씠 �걡湲곕㈃ �룞�옉
             arg.forEach((key, value)->{
-                System.out.println( String.format("커넥션 끊김~! 키 -> %s, 값 -> %s", key, value) );
+                System.out.println( String.format("session closed key -> %s, value -> %s", key, value) );
             });
         });
-        client.initDeliveryComplete((arg)-> {  //콜백행위2, 메시지를 전송한 이후 동작
+        client.initDeliveryComplete((arg)-> {  //肄쒕갚�뻾�쐞2, 硫붿떆吏�瑜� �쟾�넚�븳 �씠�썑 �룞�옉
             arg.forEach((key, value)->{
-                System.out.println( String.format("메시지 전달 완료~! 키 -> %s, 값 -> %s", key, value) );
+                System.out.println( String.format("complete to send message-> %s, 媛� -> %s", key, value) );
             });
         });
         
@@ -43,7 +43,7 @@ public class ReceiveMqtt{
             try {
                 Thread.sleep(1000*sec);
                 System.out.println("close");
-                client.close();  //종료는 이렇게!
+                client.close();  //醫낅즺�뒗 �씠�젃寃�!
             } catch (Exception e) {
                 e.printStackTrace();
             }
