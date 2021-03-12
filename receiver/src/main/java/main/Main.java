@@ -10,5 +10,4 @@ public class Main {
 		ReceiveMqtt receiveMqtt=new ReceiveMqtt("receiver");
 		receiveMqtt.listen(1800, topics);
 	}
-
 }

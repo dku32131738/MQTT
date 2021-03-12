@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ictway.mqtt.domain.RiderDomain;
 import com.ictway.mqtt.repository.RiderRepository;
-import com.ictway.mqtt.service.AccessDBService;
+import com.ictway.mqtt.service.RiderService;
 import com.ictway.mqtt.repository.PGRiderRepository;
 
 /**
@@ -24,8 +26,8 @@ import com.ictway.mqtt.repository.PGRiderRepository;
 @Controller
 public class HomeController {
 	
-	@Autowired
-	private AccessDBService accessDBService;
+	@Inject
+	private RiderService riderService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
@@ -34,7 +36,12 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(Model model) {
-		model.addAttribute("ID",accessDBService.riderService("r01"));
+		try {
+			model.addAttribute("ID",riderService.findAll().get(1).getId());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return "home";
 	}
 }

@@ -22,7 +22,7 @@ public class ReceiveMqtt{
             		MqttDomain mqttDomain=new MqttDomain(value.toString());
             		mqttDomain.messageOfHttp();
             	}
-                System.out.println( String.format("messeage arrived : �key -> %s, value -> %s", key, value) );
+                System.out.println( String.format("messeage arrived : key -> %s, value -> %s", key, value) );
             });            
         };
         Client client = new Client(pdk);  //�빐�떦 �븿�닔瑜� �깮�꽦�옄濡� �꽔�뼱以��떎.

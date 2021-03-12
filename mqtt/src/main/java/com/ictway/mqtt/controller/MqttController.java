@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,31 +22,32 @@ import com.google.gson.Gson;
 import com.ictway.mqtt.domain.ResponseDomain;
 import com.ictway.mqtt.domain.RiderDomain;
 import com.ictway.mqtt.repository.PGRiderRepository;
+import com.ictway.mqtt.service.RiderService;
 import com.ictway.mqtt.service.SendMqttService;
 
 //mqtt에 관련된 요청을 처리하는 controller
 @RestController
 public class MqttController {
 	
-	@Autowired
-	private PGRiderRepository pgRiderRepository;
+	@Inject
+	private RiderService riderService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(MqttController.class);
 	
 	//http로 receiver가 요청을 하였을때
-	@GetMapping("/mqtt")
+	@GetMapping("/rider")
 	@ResponseBody
-	public RiderDomain receiveMessage(@RequestParam("id") String id,@RequestParam("latitude") float latitude,@RequestParam("longitude") float longitude,@RequestParam("time") String time) {
+	public RiderDomain receiveMessage(@RequestParam String id,@RequestParam String latitude,@RequestParam String longitude,@RequestParam String time){
 		//id,gps,시간정보를 얻듬
-		logger.info("access mqtt");
+		logger.info("welcome to server");
 		RiderDomain riderDomain=new RiderDomain();
 		Gson gson=new Gson();
 		ResponseDomain responseDomain=new ResponseDomain();
 		responseDomain.setId(id);
 		responseDomain.setMessage("received");
 		riderDomain.setId(id);
-		riderDomain.setLatitude(latitude);
-		riderDomain.setLongitude(longitude);
+		riderDomain.setLatitude(Float.parseFloat(latitude));
+		riderDomain.setLongitude(Float.parseFloat(longitude));
 		Date date;
 
 		SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -57,10 +60,16 @@ public class MqttController {
 		}
 		riderDomain.setTime(date);
 		try {
-			pgRiderRepository.insertRider(riderDomain);
-		}catch(Exception e) {
-			responseDomain.setError("DB수정 실패");
-			logger.error(e.toString());
+			if(riderService.findById(id).orElse(null) != null) {
+				riderService.updateRider(riderDomain);
+				logger.info("DB updated");
+			}else {
+				riderService.insertRider(riderDomain);
+				logger.info("DB inserted");
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		SendMqttService sendMqttService=new SendMqttService(id,gson.toJson(responseDomain));
 		sendMqttService.sendMqtt(2);

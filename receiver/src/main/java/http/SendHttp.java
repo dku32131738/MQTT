@@ -5,7 +5,7 @@ import com.google.gson.JsonArray;
 //�꽌踰꾨줈 http瑜� �쟾�넚
 public class SendHttp {
 
-	private String server="http://127.0.0.1:8000/mqtt/mqtt?";
+	private String server="http://127.0.0.1:8000/mqtt/rider?";
 	private String url;
 	private String message;
 	

@@ -8,6 +8,9 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.ictway.mqtt.domain.RiderDomain;
+
 public class SendMqttService {
 	
 	private String topic;
@@ -20,11 +23,21 @@ public class SendMqttService {
 	
 	//service 객체 생성 및 초기화
 	public SendMqttService(String topic,String content) {
-		this.broker="tcp://127.0.0.1:1883";;
+		this.broker="tcp://192.168.0.146:1883";
 		this.clientID="system";
 		this.topic=topic;
 		this.content=content;
 		this.persistence=new MemoryPersistence();
+	}
+	
+	public SendMqttService(String topic,RiderDomain riderDomain) {
+		this.broker="tcp://192.168.0.146:1883";
+		this.clientID="system";
+		this.topic=topic;
+		Gson gson=new Gson();
+		this.content=gson.toJson(riderDomain).toString();
+		this.persistence=new MemoryPersistence();
+		logger.info(content);
 	}
 
 	//mqtt전송
@@ -42,7 +55,7 @@ public class SendMqttService {
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(qos);
             sampleClient.publish(topic, message);
-            logger.info("Message published");
+            logger.info("Message published"+topic);
             sampleClient.disconnect();
             logger.info("Disconnected");
             flag=true;

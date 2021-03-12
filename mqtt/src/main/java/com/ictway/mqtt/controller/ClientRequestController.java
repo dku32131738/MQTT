@@ -1,5 +1,9 @@
 package com.ictway.mqtt.controller;
 
+import java.io.IOException;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,31 +14,34 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ictway.mqtt.domain.ResponseDomain;
 import com.ictway.mqtt.domain.RiderDomain;
-import com.ictway.mqtt.service.AccessDBService;
+import com.ictway.mqtt.service.FirebaseCloudMessageService;
+import com.ictway.mqtt.service.RiderService;
+import com.ictway.mqtt.service.SendMqttService;
 
 @RestController
 public class ClientRequestController {
 	
-	@Autowired
-	private AccessDBService accessDBService;
+	@Inject
+	private RiderService riderService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(ClientRequestController.class);
 
 	@GetMapping("/client")
 	@ResponseBody
-	public ResponseDomain responseClient(@RequestParam("clientId") String clientId,@RequestParam("riderId") String RiderId) {
+	public RiderDomain responseClient(@RequestParam("clientId") String clientId,@RequestParam("riderId") String riderId) throws IOException {
 		logger.info("ClientResponseClient");
-		ResponseDomain responseDomain=new ResponseDomain();
-		responseDomain.setId(clientId);
-		logger.info("set ID");
-		RiderDomain rider=accessDBService.clientService("riderId");
-		if(rider==null) {
-			responseDomain.setMessage("검색 실패");
-			responseDomain.setError("rider가 존재하지 않습니다.");
+		RiderDomain rider;
+		try {
+			rider = riderService.findById(riderId).get();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			rider=null;
+			logger.warn("라이더가 존재하지 않습니다.");
 		}
-		else {
-			responseDomain.setMessage(rider.getId()+" "+rider.getLongitude()+" "+rider.getLatitude()+" "+rider.getTime());
-		}
-		return responseDomain;
+		SendMqttService sendMqttService=new SendMqttService(clientId,rider);
+		sendMqttService.sendMqtt(2);
+		FirebaseCloudMessageService firebaseCloudMessageService=new FirebaseCloudMessageService();
+		firebaseCloudMessageService.sendMessageTo(clientId, "라이더 위치 확인","test" );
+		return rider;
 	}
 }
